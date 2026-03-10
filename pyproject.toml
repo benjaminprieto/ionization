@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ionprofile"
+version = "1.0.0"
+description = "pH-dependent ionization profiling for molecules"
+requires-python = ">=3.9"
+
+dependencies = [
+    "pandas>=1.5",
+    "numpy>=1.23",
+    "pyyaml>=6.0",
+    "openpyxl>=3.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["01_src"]
+
+[tool.pytest.ini_options]
+testpaths = ["06_tests"]
+addopts = "-v --tb=short"

@@ -1,0 +1,49 @@
+# =============================================================================
+# ionprofile - Configuration
+# =============================================================================
+# pH-dependent ionization profiling for molecules.
+#
+# USAGE:
+#   python 02_scripts/run_profiling.py \
+#       --config 03_configs/profiling.yaml \
+#       --data-dir 04_data/molecules/
+#
+# All parameters can be overridden via CLI flags.
+#
+# Project: ionprofile
+# Version: 1.0.0
+# =============================================================================
+
+parameters:
+  # --- Protonation engine ---
+  # Options: "dimorphite" (more coming: "qupkake", "unipka")
+  engine: "dimorphite"
+
+  # --- pH Gradient ---
+  # Default: physiological cytoplasm (7.4) to endosomal (6.0)
+  ph_max: 7.4
+  ph_min: 6.0
+  ph_step: 0.1
+
+  # --- Engine precision ---
+  # pKa precision for dimorphite_dl (lower = faster, less accurate)
+  precision: 0.5
+
+  # --- Logging ---
+  log_level: "INFO"    # DEBUG, INFO, WARNING, ERROR
+
+outputs:
+  # --- Output directory ---
+  # Results go to: {output_dir}/{run_id}/
+  output_dir: "05_results"
+
+  # --- File naming ---
+  output_prefix: "ionization_profiling"
+
+  # --- Formats to generate ---
+  # Options: csv, excel, json, sdf
+  formats:
+    - csv
+    - excel
+    - json
+    - sdf
