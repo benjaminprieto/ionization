@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2f51a1b-c7ef-464c-ba70-e6795e94cc40" name="Changes" comment="Ammends">
-      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/profiling/engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/profiling/engine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/profiling/ionizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/profiling/ionizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/reporting/sdf_report.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/reporting/sdf_report.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,7 +50,7 @@
     "WebServerToolWindowPanel.toolwindow.show.permissions": "false",
     "WebServerToolWindowPanel.toolwindow.show.size": "false",
     "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/benja/PycharmProjects/ionization/04_data/molecules",
+    "last_opened_file_path": "C:/Users/benja/PycharmProjects/ionization",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -64,11 +62,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\benja\PycharmProjects\ionization" />
       <recent name="C:\Users\benja\PycharmProjects\ionization\04_data\molecules" />
       <recent name="C:\Users\benja\PycharmProjects\ionization\01_src\ionprofile\profiling\engines" />
       <recent name="C:\Users\benja\PycharmProjects\ionization\01_src\ionprofile\reporting" />
       <recent name="C:\Users\benja\PycharmProjects\ionization\02_scripts" />
-      <recent name="C:\Users\benja\PycharmProjects\ionization\03_configs" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -87,7 +85,7 @@
       <option name="presentableId" value="Default" />
       <updated>1773000246497</updated>
       <workItem from="1773000247519" duration="165000" />
-      <workItem from="1773002469824" duration="29104000" />
+      <workItem from="1773002469824" duration="30204000" />
     </task>
     <task id="LOCAL-00001" summary="Ammends">
       <option name="closed" value="true" />
@@ -97,7 +95,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773150238616</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Ammends">
+      <option name="closed" value="true" />
+      <created>1773150768118</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1773150768118</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
