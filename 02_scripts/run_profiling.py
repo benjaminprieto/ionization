@@ -2,21 +2,30 @@
 """
 run_profiling.py - ionprofile CLI
 ===================================
-Command-line interface for ionization profiling.
+Simple command-line interface for ionization profiling.
 
-Two modes:
-    1. Config mode (recommended):
-       python 02_scripts/run_profiling.py \
-           --config 03_configs/profiling.yaml \
-           --data-dir 04_data/molecules/
+Usage:
+    # Simplest: just point to your molecules
+    python 02_scripts/run_profiling.py 04_data/molecules/
 
-    2. Direct mode:
-       python 02_scripts/run_profiling.py \
-           --input molecules.sdf \
-           --ph-max 7.4 --ph-min 6.0
+    # With engine choice
+    python 02_scripts/run_profiling.py 04_data/molecules/ -e openbabel
 
+    # Single file
+    python 02_scripts/run_profiling.py my_compounds.sdf
+
+    # Custom pH range
+    python 02_scripts/run_profiling.py 04_data/molecules/ --ph 7.4 6.0
+
+    # Full control (single line — works on Windows and Linux)
+    python 02_scripts/run_profiling.py 04_data/molecules/ -e qupkake --ph 7.4 6.0 --step 0.2 --name my_run
+
+    # Full control with YAML config
+    python 02_scripts/run_profiling.py --config 03_configs/profiling.yaml --data-dir 04_data/molecules/ --run-id test_ob --engine openbabel --formats csv excel json sdf
+
+ nohup python 02_scripts/run_profiling.py --data-dir 04_data/molecules/ --engine qupkake --run-id overnight_open --formats csv excel json sdf > overnight_qupkake.log 2>&1 &
 Project: ionprofile
-Version: 1.0.0
+Version: 1.1.0
 """
 
 import argparse
@@ -33,7 +42,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / '01_src'))
 from ionprofile.profiling.engine import run_profiling
 from ionprofile.profiling.ionizer import list_engines
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -42,17 +51,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def load_yaml(path: str) -> dict:
-    """Load YAML configuration file."""
-    with open(path, 'r', encoding='utf-8') as f:
-        return yaml.safe_load(f)
-
-
-def setup_log_file(log_path: Path, log_level: str = "INFO"):
+def setup_log_file(log_path: Path):
     """Add file handler to root logger."""
     log_path.parent.mkdir(parents=True, exist_ok=True)
     handler = logging.FileHandler(str(log_path), mode='w', encoding='utf-8')
-    handler.setLevel(getattr(logging, log_level.upper(), logging.INFO))
     handler.setFormatter(logging.Formatter(
         '%(asctime)s | %(levelname)-8s | %(name)s | %(message)s'
     ))
@@ -62,123 +64,142 @@ def setup_log_file(log_path: Path, log_level: str = "INFO"):
 
 def main():
     parser = argparse.ArgumentParser(
-        description=f'ionprofile v{__version__} -- pH-dependent '
+        description=f'ionprofile v{__version__} — pH-dependent '
                     f'ionization profiling',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:
-  # Config mode (recommended)
-  python 02_scripts/run_profiling.py \\
-      --config 03_configs/profiling.yaml \\
-      --data-dir 04_data/molecules/
+  %(prog)s 04_data/molecules/                                          # all files, default engine
+  %(prog)s 04_data/molecules/ -e openbabel                             # use OpenBabel
+  %(prog)s 04_data/molecules/ -e qupkake --name my_run                 # use QupKake (slow, accurate)
+  %(prog)s my_compounds.sdf                                            # single SDF file
+  %(prog)s compounds.csv --ph 7.4 5.0                                  # custom pH range
+  %(prog)s 04_data/molecules/ --name golgi_screen                      # custom run name
+  %(prog)s 04_data/molecules/ --formats csv excel                      # choose outputs
+  %(prog)s --config 03_configs/profiling.yaml                          # full YAML config
+  %(prog)s --engines                                                   # list available engines
 
-  # Single file, direct mode
-  python 02_scripts/run_profiling.py \\
-      --input my_compounds.sdf \\
-      --ph-max 7.4 --ph-min 6.0 --ph-step 0.1
+Full control (single line):
+  %(prog)s 04_data/molecules/ -e qupkake --ph 7.4 6.0 --step 0.2 --name my_run --formats csv excel json sdf
 
-  # Custom run ID and output formats
-  python 02_scripts/run_profiling.py \\
-      --config 03_configs/profiling.yaml \\
-      --data-dir 04_data/molecules/ \\
-      --run-id my_experiment_01 \\
-      --formats csv excel json sdf
-
-  # CSV with explicit columns
-  python 02_scripts/run_profiling.py \\
-      --input compounds.csv \\
-      --smiles-column canonical_smiles \\
-      --id-column compound_id
-
-  # List available engines
-  python 02_scripts/run_profiling.py --list-engines
+With YAML config:
+  %(prog)s --config 03_configs/profiling.yaml --data-dir 04_data/molecules/ --run-id test_ob --engine openbabel
         '''
     )
 
-    # Config mode
-    parser.add_argument('--config', '-c', type=str,
-                        help='YAML config file (03_configs/profiling.yaml)')
-    parser.add_argument('--data-dir', '-d', type=str,
-                        help='Directory with molecular files')
+    # === THE ONLY REQUIRED ARGUMENT ===
+    parser.add_argument(
+        'input', nargs='?', default=None,
+        help='Input file or directory with molecules '
+             '(SDF, MOL2, CSV, SMILES, PDB)'
+    )
 
-    # Direct mode
-    parser.add_argument('--input', '-i', type=str, default=None,
-                        help='Input file (SDF, MOL2, CSV, SMILES, PDB)')
+    # === COMMON OPTIONS (short flags) ===
+    parser.add_argument(
+        '-e', '--engine', type=str, default='dimorphite',
+        choices=['dimorphite', 'openbabel', 'qupkake'],
+        help='Protonation engine (default: dimorphite)'
+    )
+    parser.add_argument(
+        '--ph', type=float, nargs=2, metavar=('MAX', 'MIN'),
+        default=[7.4, 6.0],
+        help='pH range as MAX MIN (default: 7.4 6.0)'
+    )
+    parser.add_argument(
+        '--step', type=float, default=0.1,
+        help='pH step size (default: 0.1)'
+    )
+    parser.add_argument(
+        '--name', '-n', type=str, default=None,
+        help='Run name for output folder (default: auto timestamp)'
+    )
+    parser.add_argument(
+        '--formats', '-f', type=str, nargs='+',
+        default=['csv', 'excel', 'json', 'sdf'],
+        choices=['csv', 'excel', 'json', 'sdf'],
+        help='Output formats (default: all)'
+    )
+    parser.add_argument(
+        '--output', '-o', type=str, default='05_results',
+        help='Output base directory (default: 05_results)'
+    )
 
-    # Overrides
-    parser.add_argument('--output', '-o', type=str, default=None,
-                        help='Output directory override')
-    parser.add_argument('--run-id', type=str, default=None,
-                        help='Custom run identifier (default: timestamp)')
-    parser.add_argument('--engine', type=str, default=None,
-                        help='Protonation engine (default: dimorphite)')
-    parser.add_argument('--ph-max', type=float, default=None,
-                        help='Override max pH (e.g. 7.4)')
-    parser.add_argument('--ph-min', type=float, default=None,
-                        help='Override min pH (e.g. 6.0)')
-    parser.add_argument('--ph-step', type=float, default=None,
-                        help='Override pH step (e.g. 0.1)')
-    parser.add_argument('--precision', type=float, default=None,
-                        help='Override engine precision')
-    parser.add_argument('--formats', type=str, nargs='+', default=None,
-                        choices=['csv', 'excel', 'json', 'sdf'],
-                        help='Output formats (default from config)')
-    parser.add_argument('--smiles-column', type=str, default=None,
-                        help='SMILES column name for CSV input')
-    parser.add_argument('--id-column', type=str, default=None,
-                        help='Molecule ID column name for CSV input')
-    parser.add_argument('--format-hint', type=str, default=None,
-                        choices=['smiles_csv', 'sdf', 'mol2', 'pdb'],
-                        help='Override input format auto-detection')
-    parser.add_argument('--log-level', type=str, default=None,
-                        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
-                        help='Log level')
-    parser.add_argument('--verbose', '-v', action='store_true',
-                        help='Enable DEBUG logging')
-    parser.add_argument('--list-engines', action='store_true',
-                        help='List available protonation engines and exit')
-    parser.add_argument('--version', action='version',
-                        version=f'ionprofile {__version__}')
+    # === LESS COMMON OPTIONS ===
+    parser.add_argument(
+        '--config', '-c', type=str, default=None,
+        help='YAML config file (overrides all other options)'
+    )
+    parser.add_argument(
+        '--data-dir', '-d', type=str, default=None,
+        help='Directory with molecular files (alias for positional input)'
+    )
+    parser.add_argument(
+        '--run-id', type=str, default=None,
+        help='Alias for --name (backwards compatibility)'
+    )
+    parser.add_argument(
+        '--precision', type=float, default=0.5,
+        help='Engine pKa precision (default: 0.5)'
+    )
+    parser.add_argument(
+        '--smiles-col', type=str, default=None,
+        help='SMILES column name for CSV input'
+    )
+    parser.add_argument(
+        '--id-col', type=str, default=None,
+        help='Molecule ID column name for CSV input'
+    )
+
+    # === UTILITY ===
+    parser.add_argument(
+        '--engines', action='store_true',
+        help='List available engines and exit'
+    )
+    parser.add_argument(
+        '-v', '--verbose', action='store_true',
+        help='Show debug output'
+    )
+    parser.add_argument(
+        '--version', action='version',
+        version=f'ionprofile {__version__}'
+    )
 
     args = parser.parse_args()
 
     # --- List engines ---
-    if args.list_engines:
+    if args.engines:
         engines = list_engines()
-        print(f"\nionprofile v{__version__} - Available engines:\n")
+        print(f"\nionprofile v{__version__} — Available engines:\n")
         for key, info in engines.items():
-            status = "READY" if info["available"] else "NOT INSTALLED"
+            status = "✓ READY" if info["available"] else "✗ NOT INSTALLED"
             print(f"  {key:15s}  {info['name']:20s}  [{status}]")
         print()
         return 0
 
-    # --- Log level ---
+    # --- Verbose ---
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
-    elif args.log_level:
-        logging.getLogger().setLevel(
-            getattr(logging, args.log_level, logging.INFO)
-        )
 
     # =========================================================================
-    # DEFAULTS
+    # RESOLVE PARAMETERS
     # =========================================================================
-    engine = "dimorphite"
-    ph_max = 7.4
-    ph_min = 6.0
-    ph_step = 0.1
-    precision = 0.5
+
+    # Defaults
+    engine = args.engine
+    ph_max, ph_min = args.ph[0], args.ph[1]
+    ph_step = args.step
+    precision = args.precision
+    output_formats = args.formats
+    output_dir = args.output
     output_prefix = "ionization_profiling"
-    output_formats = ["csv", "json"]
-    output_dir = "05_results"
-    log_level = "INFO"
-    run_id = args.run_id
+    run_id = args.name or args.run_id
+    input_path = args.input or args.data_dir
 
-    # =========================================================================
-    # LOAD CONFIG
-    # =========================================================================
+    # Config mode overrides everything
     if args.config:
-        config = load_yaml(args.config)
+        with open(args.config, 'r', encoding='utf-8') as f:
+            config = yaml.safe_load(f)
+
         params = config.get('parameters', {})
         outputs = config.get('outputs', {})
 
@@ -187,66 +208,37 @@ Examples:
         ph_min = params.get('ph_min', ph_min)
         ph_step = params.get('ph_step', ph_step)
         precision = params.get('precision', precision)
-        log_level = params.get('log_level', log_level)
-
         output_prefix = outputs.get('output_prefix', output_prefix)
         output_formats = outputs.get('formats', output_formats)
         output_dir = outputs.get('output_dir', output_dir)
 
-    # --- Input source ---
-    if args.data_dir:
-        input_path = args.data_dir
-    elif args.input:
-        input_path = args.input
-    else:
-        parser.error(
-            "Requires either --data-dir (config mode) or --input "
-            "(direct mode). Use --list-engines to see available engines."
-        )
+        # Config can specify input too
+        if input_path is None:
+            input_path = config.get('input', {}).get('path')
 
-    # --- CLI overrides ---
-    if args.engine is not None:
-        engine = args.engine
-    if args.ph_max is not None:
-        ph_max = args.ph_max
-    if args.ph_min is not None:
-        ph_min = args.ph_min
-    if args.ph_step is not None:
-        ph_step = args.ph_step
-    if args.precision is not None:
-        precision = args.precision
-    if args.formats is not None:
-        output_formats = args.formats
-    if args.output is not None:
-        output_dir = args.output
-    if args.log_level:
-        log_level = args.log_level
+    # --- Validate input ---
+    if input_path is None:
+        parser.print_help()
+        print("\nError: provide an input file/directory or use --config")
+        return 1
 
-    # =========================================================================
-    # VALIDATE
-    # =========================================================================
     input_p = Path(input_path)
     if not input_p.exists():
         logger.error(f"Input not found: {input_path}")
         return 1
 
     if ph_max <= ph_min:
-        logger.error(f"ph_max ({ph_max}) must be > ph_min ({ph_min})")
+        logger.error(f"pH max ({ph_max}) must be > pH min ({ph_min})")
         return 1
 
-    if ph_step <= 0:
-        logger.error(f"ph_step ({ph_step}) must be > 0")
-        return 1
-
-    # =========================================================================
-    # SETUP LOG FILE
-    # =========================================================================
+    # --- Run ID ---
     if run_id is None:
         run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
 
+    # --- Log file ---
     log_dir = Path(output_dir) / run_id
     log_dir.mkdir(parents=True, exist_ok=True)
-    setup_log_file(log_dir / 'ionprofile.log', log_level)
+    setup_log_file(log_dir / 'ionprofile.log')
 
     # =========================================================================
     # RUN
@@ -263,9 +255,8 @@ Examples:
             output_prefix=output_prefix,
             output_formats=output_formats,
             run_id=run_id,
-            smiles_column=args.smiles_column,
-            id_column=args.id_column,
-            format_hint=args.format_hint,
+            smiles_column=args.smiles_col,
+            id_column=args.id_col,
         )
 
         logger.info(f"\nAll outputs in: {result['output_dir']}")

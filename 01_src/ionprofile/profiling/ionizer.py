@@ -10,6 +10,11 @@ Usage:
     engine = get_engine("dimorphite")
     charge = engine.calculate_charge_at_ph("CCO", ph=7.4)
 
+Available engines:
+    dimorphite  - Fast empirical (38 SMARTS rules, ms/mol)
+    openbabel   - Fast empirical (20-30 rules, ms/mol)
+    qupkake     - ML + QM pKa prediction (RMSE 0.5-0.8, sec/mol)
+
 Adding a new engine:
     1. Create the engine class in engines/ (inherit from BaseEngine)
     2. Add one line to ENGINE_REGISTRY below
@@ -22,6 +27,8 @@ from typing import Dict
 
 from ionprofile.profiling.engines.base import BaseEngine
 from ionprofile.profiling.engines.dimorphite_engine import DimorphiteEngine
+from ionprofile.profiling.engines.openbabel_engine import OpenBabelEngine
+from ionprofile.profiling.engines.qupkake_engine import QupKakeEngine
 from ionprofile.profiling.rdkit_utils import is_rdkit_available
 
 logger = logging.getLogger(__name__)
@@ -30,14 +37,11 @@ logger = logging.getLogger(__name__)
 # =========================================================================
 # ENGINE REGISTRY
 # =========================================================================
-# To add a new engine, import it and add one line here:
-#
-#   from ionprofile.profiling.engines.qupkake_engine import QupKakeEngine
-#   "qupkake": QupKakeEngine,
 
 ENGINE_REGISTRY: Dict[str, type] = {
     "dimorphite": DimorphiteEngine,
-    # "qupkake": QupKakeEngine,    # future
+    "openbabel": OpenBabelEngine,
+    "qupkake": QupKakeEngine,
     # "unipka": UniPkaEngine,      # future
 }
 
@@ -47,7 +51,8 @@ def get_engine(engine_name: str = "dimorphite") -> BaseEngine:
     Get the configured protonation engine.
 
     Args:
-        engine_name: Key from ENGINE_REGISTRY (e.g. "dimorphite").
+        engine_name: Key from ENGINE_REGISTRY.
+                     Options: "dimorphite", "openbabel", "qupkake"
 
     Returns:
         Initialized engine instance, ready to use.

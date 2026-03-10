@@ -54,7 +54,7 @@ def parse_sdf_file(filepath: str) -> pd.DataFrame:
     # Suppress RDKit warnings during parsing
     from rdkit import RDLogger
     rd_logger = RDLogger.logger()
-    original_level = rd_logger.level()
+    original_level = RDLogger.WARNING
     rd_logger.setLevel(RDLogger.ERROR)
 
     try:

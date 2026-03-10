@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="f2f51a1b-c7ef-464c-ba70-e6795e94cc40" name="Changes" comment="" />
+    <list default="true" id="f2f51a1b-c7ef-464c-ba70-e6795e94cc40" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/ionization.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ionization.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/io/sdf_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/io/sdf_parser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/profiling/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/profiling/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/profiling/engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/profiling/engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/profiling/engines/openbabel_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/profiling/engines/openbabel_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/profiling/engines/qupkake_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/profiling/engines/qupkake_engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/profiling/ionizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/profiling/ionizer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/02_scripts/run_profiling.py" beforeDir="false" afterPath="$PROJECT_DIR$/02_scripts/run_profiling.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/environment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/environment.yaml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,23 +24,60 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 1
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "benjaminprieto"
+  }
 }]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/benjaminprieto/ionization.git",
+    "accountId": "2433f814-032a-47dd-a3a2-d19c4fe11d05"
+  }
+}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
   <component name="ProjectId" id="3Ag3B0nkATTSKWwf1hPiCa11x5D" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "WebServerToolWindowPanel.toolwindow.highlight.mappings": "true",
+    "WebServerToolWindowPanel.toolwindow.highlight.symlinks": "true",
+    "WebServerToolWindowPanel.toolwindow.show.date": "false",
+    "WebServerToolWindowPanel.toolwindow.show.permissions": "false",
+    "WebServerToolWindowPanel.toolwindow.show.size": "false",
     "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/benja/PycharmProjects/ionization/04_data/molecules",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\benja\PycharmProjects\ionization\04_data\molecules" />
+      <recent name="C:\Users\benja\PycharmProjects\ionization\01_src\ionprofile\profiling\engines" />
+      <recent name="C:\Users\benja\PycharmProjects\ionization\01_src\ionprofile\reporting" />
+      <recent name="C:\Users\benja\PycharmProjects\ionization\02_scripts" />
+      <recent name="C:\Users\benja\PycharmProjects\ionization\03_configs" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -43,6 +94,7 @@
       <option name="presentableId" value="Default" />
       <updated>1773000246497</updated>
       <workItem from="1773000247519" duration="165000" />
+      <workItem from="1773002469824" duration="28783000" />
     </task>
     <servers />
   </component>

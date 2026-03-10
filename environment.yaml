@@ -1,13 +1,10 @@
 # =============================================================================
-# ionization - Conda Environment
+# ionprofile - Conda Environment (Server + GPU)
 # =============================================================================
-# Crea el entorno completo con un solo comando:
-#
-#   conda env create -f environment.yaml
-#   conda activate ionization_env
-#
-# Para actualizar si cambian dependencias:
+# Instalar/actualizar:
 #   conda env update -f environment.yaml
+#   conda activate ionization_env
+#   pip install -e .
 # =============================================================================
 
 name: ionization_env
@@ -19,10 +16,12 @@ dependencies:
   # --- Python ---
   - python=3.10
 
-  # --- Chemistry (mejor via conda) ---
+  # --- Chemistry ---
   - rdkit
+  - openbabel
+  - xtb
 
-  # --- Core Python packages ---
+  # --- Core ---
   - pandas>=1.5
   - numpy>=1.23
   - openpyxl>=3.1
@@ -35,3 +34,4 @@ dependencies:
   - pip
   - pip:
       - dimorphite_dl
+      - qupkake

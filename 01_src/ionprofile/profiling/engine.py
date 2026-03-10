@@ -4,9 +4,9 @@ engine.py - Ionization profiling orchestrator
 Main entry point for running ionization profiles. Coordinates:
     1. Input reading (via ionprofile.io)
     2. pH gradient generation
-    3. Charge calculation (via ionizer -> engines)
+    3. Charge calculation + protonated SMILES capture (via engines)
     4. Transition metrics
-    5. Output generation (via ionprofile.reporting)
+    5. Output generation: tables (CSV, Excel, JSON) + structures (SDF)
 
 This is the function you import when using ionprofile as a library:
     from ionprofile import run_profiling
@@ -26,6 +26,7 @@ from ionprofile.profiling.ionizer import get_engine, check_dependencies
 from ionprofile.reporting.csv_report import save_csv
 from ionprofile.reporting.excel_report import save_excel
 from ionprofile.reporting.json_report import save_json
+from ionprofile.reporting.sdf_report import save_sdf
 
 logger = logging.getLogger(__name__)
 
@@ -55,8 +56,13 @@ def generate_ph_values(
 
 
 def _ph_col_name(ph: float) -> str:
-    """Column name for a pH value: Q_pH74, Q_pH62, etc."""
+    """Charge column name: Q_pH74, Q_pH62, etc."""
     return f"Q_pH{int(round(ph * 10))}"
+
+
+def _ph_smiles_col_name(ph: float) -> str:
+    """Protonated SMILES column name: SMILES_pH74, SMILES_pH62, etc."""
+    return f"SMILES_pH{int(round(ph * 10))}"
 
 
 # =========================================================================
@@ -70,18 +76,14 @@ def calculate_ionization_profile(
         precision: float = 0.5,
 ) -> pd.DataFrame:
     """
-    Calculate formal charge at each pH for every molecule.
+    Calculate formal charge AND protonated SMILES at each pH.
 
-    Args:
-        df:           DataFrame with at least 'smiles' column.
-        ph_values:    List of pH values (descending).
-        engine_name:  Which protonation engine to use.
-        precision:    Engine-specific precision parameter.
+    For each molecule x each pH, captures:
+        - Q_pH{value}: formal charge (int)
+        - SMILES_pH{value}: protonated SMILES (str)
 
-    Returns:
-        DataFrame with added columns:
-        - Q_pH{value}: Charge at each pH
-        - N_Transitions: Number of pH steps with charge change
+    Also computes transition metrics:
+        - N_Transitions: how many pH steps show a charge change
         - First_Transition_pH: pH where charge first differs from ph_max
     """
     engine = get_engine(engine_name)
@@ -91,11 +93,12 @@ def calculate_ionization_profile(
                        f"Charge columns will be null.")
         for ph in ph_values:
             df[_ph_col_name(ph)] = None
+            df[_ph_smiles_col_name(ph)] = None
         df["N_Transitions"] = None
         df["First_Transition_pH"] = None
         return df
 
-    # Silence RDKit warnings during calculation
+    # Silence RDKit warnings
     try:
         from rdkit import RDLogger
         RDLogger.logger().setLevel(RDLogger.ERROR)
@@ -108,23 +111,27 @@ def calculate_ionization_profile(
     logger.info(f"  Engine:   {engine.name()}")
     logger.info(f"  pH range: {ph_values[0]} -> {ph_values[-1]}")
 
-    # Calculate charge at each pH for each molecule
+    # Calculate charge AND protonated SMILES at each pH
     charge_data = {ph: [] for ph in ph_values}
+    smiles_data = {ph: [] for ph in ph_values}
 
     for idx, row in df.iterrows():
         smiles = row.get("smiles", "")
 
         for ph in ph_values:
             q = engine.calculate_charge_at_ph(smiles, ph, precision)
+            prot_smi = engine.get_protonated_smiles(smiles, ph, precision)
             charge_data[ph].append(q)
+            smiles_data[ph].append(prot_smi)
 
         if (idx + 1) % 100 == 0 or (idx + 1) == n_molecules:
             logger.info(f"  Progress: {idx + 1}/{n_molecules}")
 
-    # Add charge columns to DataFrame
+    # Add columns to DataFrame
     df = df.copy()
     for ph in ph_values:
         df[_ph_col_name(ph)] = charge_data[ph]
+        df[_ph_smiles_col_name(ph)] = smiles_data[ph]
 
     # Add transition metrics
     _add_transition_metrics(df, ph_values)
@@ -220,7 +227,8 @@ def run_profiling(
         precision:      Engine precision parameter.
         engine:         Protonation engine: "dimorphite" (more coming).
         output_prefix:  Base name for output files.
-        output_formats: List: ['csv', 'excel', 'json']. Default: ['csv', 'json'].
+        output_formats: List: ['csv', 'excel', 'json', 'sdf'].
+                        Default: ['csv', 'json'].
         run_id:         Custom run identifier (default: timestamp).
         smiles_column:  Override SMILES column name (CSV input).
         id_column:      Override molecule ID column name (CSV input).
@@ -300,13 +308,17 @@ def run_profiling(
     # --- Generate outputs ---
     output_files = {}
 
+    # Columns for table outputs (CSV, Excel, JSON)
     base_cols = ["mol_id", "smiles"]
     meta_cols = [c for c in ["source_file", "format"] if c in df.columns]
     charge_cols = [_ph_col_name(ph) for ph in ph_values
                    if _ph_col_name(ph) in df.columns]
+    smiles_cols = [_ph_smiles_col_name(ph) for ph in ph_values
+                   if _ph_smiles_col_name(ph) in df.columns]
     metric_cols = [c for c in ["N_Transitions", "First_Transition_pH"]
                    if c in df.columns]
-    output_cols = base_cols + meta_cols + charge_cols + metric_cols
+    output_cols = (base_cols + meta_cols + charge_cols
+                   + smiles_cols + metric_cols)
     df_out = df[output_cols].copy()
 
     if "csv" in output_formats:
@@ -332,6 +344,11 @@ def run_profiling(
         })
         output_files["json"] = str(json_path)
 
+    if "sdf" in output_formats:
+        sdf_dir = output_path / "structures"
+        sdf_files = save_sdf(df_out, sdf_dir, ph_values, output_prefix)
+        output_files["sdf"] = sdf_files
+
     # --- Summary ---
     logger.info("")
     logger.info("=" * 60)
@@ -341,7 +358,11 @@ def run_profiling(
     logger.info(f"Engine:       {engine}")
     logger.info(f"pH values:    {len(ph_values)}")
     for fmt, fpath in output_files.items():
-        logger.info(f"  {fmt.upper():10s}: {fpath}")
+        if isinstance(fpath, dict):
+            for sub_key, sub_path in fpath.items():
+                logger.info(f"  SDF {sub_key}: {sub_path}")
+        else:
+            logger.info(f"  {fmt.upper():10s}: {fpath}")
     logger.info("=" * 60)
     logger.info("IONPROFILE COMPLETE")
     logger.info("=" * 60)
