@@ -4,17 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f2f51a1b-c7ef-464c-ba70-e6795e94cc40" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/ionization.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ionization.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/io/sdf_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/io/sdf_parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/profiling/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/profiling/__init__.py" afterDir="false" />
+    <list default="true" id="f2f51a1b-c7ef-464c-ba70-e6795e94cc40" name="Changes" comment="Ammends">
       <change beforePath="$PROJECT_DIR$/01_src/ionprofile/profiling/engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/profiling/engine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/profiling/engines/openbabel_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/profiling/engines/openbabel_engine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/profiling/engines/qupkake_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/profiling/engines/qupkake_engine.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/01_src/ionprofile/profiling/ionizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/profiling/ionizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/02_scripts/run_profiling.py" beforeDir="false" afterPath="$PROJECT_DIR$/02_scripts/run_profiling.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/environment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/environment.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/01_src/ionprofile/reporting/sdf_report.py" beforeDir="false" afterPath="$PROJECT_DIR$/01_src/ionprofile/reporting/sdf_report.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,11 +87,25 @@
       <option name="presentableId" value="Default" />
       <updated>1773000246497</updated>
       <workItem from="1773000247519" duration="165000" />
-      <workItem from="1773002469824" duration="28783000" />
+      <workItem from="1773002469824" duration="29104000" />
     </task>
+    <task id="LOCAL-00001" summary="Ammends">
+      <option name="closed" value="true" />
+      <created>1773150238616</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1773150238616</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial commit" />
+    <MESSAGE value="Ammends" />
+    <option name="LAST_COMMIT_MESSAGE" value="Ammends" />
   </component>
 </project>

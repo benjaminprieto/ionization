@@ -10,11 +10,6 @@ Usage:
     engine = get_engine("dimorphite")
     charge = engine.calculate_charge_at_ph("CCO", ph=7.4)
 
-Available engines:
-    dimorphite  - Fast empirical (38 SMARTS rules, ms/mol)
-    openbabel   - Fast empirical (20-30 rules, ms/mol)
-    qupkake     - ML + QM pKa prediction (RMSE 0.5-0.8, sec/mol)
-
 Adding a new engine:
     1. Create the engine class in engines/ (inherit from BaseEngine)
     2. Add one line to ENGINE_REGISTRY below
@@ -37,12 +32,12 @@ logger = logging.getLogger(__name__)
 # =========================================================================
 # ENGINE REGISTRY
 # =========================================================================
+# To add a new engine, import it above and add one line here.
 
 ENGINE_REGISTRY: Dict[str, type] = {
-    "dimorphite": DimorphiteEngine,
-    "openbabel": OpenBabelEngine,
-    "qupkake": QupKakeEngine,
-    # "unipka": UniPkaEngine,      # future
+    "dimorphite": DimorphiteEngine,   # fast empirical, ms/mol
+    "openbabel": OpenBabelEngine,     # fast empirical, ms/mol
+    "qupkake": QupKakeEngine,         # ML+QM pKa, RMSE 0.5-0.8, min/mol
 }
 
 
@@ -51,8 +46,7 @@ def get_engine(engine_name: str = "dimorphite") -> BaseEngine:
     Get the configured protonation engine.
 
     Args:
-        engine_name: Key from ENGINE_REGISTRY.
-                     Options: "dimorphite", "openbabel", "qupkake"
+        engine_name: Key from ENGINE_REGISTRY (e.g. "dimorphite").
 
     Returns:
         Initialized engine instance, ready to use.

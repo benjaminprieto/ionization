@@ -1,0 +1,32 @@
+# Results and data (large files)
+05_results/
+04_data/molecules/*.sdf
+04_data/molecules/*.mol2
+04_data/proteins/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Logs
+*.log
+nohup.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+*.conda
